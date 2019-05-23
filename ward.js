@@ -19,6 +19,9 @@ const wardPinIn = new Gpio(17, 'in', 'rising');
 const wardPinOut = new Gpio(27, 'out');
 
 let shouldCheck = true;
+if (debug) {
+    console.log('Started');
+}
 wardPinIn.watch(function (err, value) {
     if (debug) {
         console.log('new');// Watch for hardware interrupts on pushButton GPIO, specify callback function
