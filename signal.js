@@ -24,6 +24,7 @@ applicationCache.service('states').patch(2, {
 */
 
 // listen
+console.log('Ok');
 const relayMap = {
     'browser': new Gpio(5, 'out'),
     'dns': new Gpio(6, 'out'),
@@ -31,8 +32,11 @@ const relayMap = {
     'server': new Gpio(19, 'out'),
 };
 client.service('states').on('patched', data => {
-    if(data.hasOwnProperty('panel') && data.hasOwnProperty('valid')){
+    if (data.hasOwnProperty('panel') && data.hasOwnProperty('valid')) {
         const panel = data.panel;
-        relayMap[panel].writeSync(data.valid);
+        const pin = relayMap[panel];
+        pin.writeSync(data.valid ? 1 : 0);
+        console.log(pin);
+        console.log(data.valid);
     }
 });
