@@ -1,4 +1,6 @@
 // Establish a Socket.io connection
+const debug = false;
+
 const feathers = require('@feathersjs/feathers');
 const socketio = require('@feathersjs/socketio-client');
 const io = require('socket.io-client');
@@ -14,15 +16,6 @@ const button = new Gpio(4, 'in', 'both');
 
 client.configure(socketio(socket));
 
-// send
-/*
-applicationCache.service('states').patch(2, {
-    data: {
-
-    }
-});
-*/
-
 // listen
 console.log('Ok');
 const relayMap = {
@@ -36,7 +29,9 @@ client.service('states').on('patched', data => {
         const panel = data.panel;
         const pin = relayMap[panel];
         pin.writeSync(data.valid ? 1 : 0);
-        console.log(pin);
-        console.log(data.valid);
+        if (debug) {
+            console.log(pin);
+            console.log(data.valid);
+        }
     }
 });
