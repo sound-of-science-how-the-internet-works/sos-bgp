@@ -16,7 +16,8 @@ client.configure(socketio(socket));
 
 // send
 const wardPinIn = new Gpio(17, 'in', 'rising');
-const wardPinOut = new Gpio(27, 'out');
+const wardPinOut = new Gpio(22, 'out');
+wardPinOut.write(1);
 
 let shouldCheck = true;
 if (debug) {
@@ -24,7 +25,8 @@ if (debug) {
 }
 wardPinIn.watch(function (err, value) {
     if (debug) {
-        console.log('new');// Watch for hardware interrupts on pushButton GPIO, specify callback function
+        console.log('WARD PIN');
+        console.log(shouldCheck);
     }
     if (!shouldCheck) {
         return;
@@ -33,12 +35,14 @@ wardPinIn.watch(function (err, value) {
         console.error('There was an error', err); //output error message to console
     }
     if (debug) {
+        console.log('new value');
         console.log(value);
     }
 
     client.service('states').patch(2, {
         valid: true
     });
+    shouldCheck = false;
 });
 let resetSended = false;
 client.service('states').on('patched', data => {
@@ -46,18 +50,19 @@ client.service('states').on('patched', data => {
         if (debug) {
             console.log('sending');
         }
-        wardPinOut.write(1);
+        wardPinOut.write(0);
         resetSended = true;
-        shouldCheck = true;
+        shouldCheck = false;
         setTimeout(function () {
             if (debug) {
                 console.log('low');
             }
-            wardPinOut.write(0);
+            wardPinOut.write(1);
             client.service('states').patch(2, {
                 valid: false
             });
-            shouldCheck = false;
-        }, 5000);
+            shouldCheck = true;
+            resetSended = false;
+        }, 1500);
     }
 });
